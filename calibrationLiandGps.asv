@@ -1,0 +1,80 @@
+
+
+
+
+%% gps data processing leador
+% gpsMatrix =  load('C:\Users\OpenICV\Desktop\matlab work space\calibration_lidar_gps\2018-02-31-17-12-53.txt');
+
+% %set the initial position and translating the WGS to location
+% [gpsMatrix(:,5), gpsMatrix(:,6) ] = wgs2local(gpsMatrix(:,5), gpsMatrix(:,6));
+% gpsMatrix(:,7) =gpsMatrix(:,7) - ones(size(gpsMatrix,1),1)*gpsMatrix(1,7);
+% 
+% location_gps  = gpsMatrix(:,5:7);
+% 
+% % location_gps(:,1) =location_gps(:,1) - ones(size(location_gps,1),1)*location_gps(1,1);
+% % location_gps(:,2) =location_gps(:,2) - ones(size(location_gps,1),1)*location_gps(1,2);
+% % location_gps(:,3) =location_gps(:,3) - ones(size(location_gps,1),1)*location_gps(1,3);
+% RPT_gps = gpsMatrix(:,2:4);
+ 
+% gpsMatrix(:,2:4) = gpsMatrix(:,2:4)./360*pi;
+% gpsRTMatrix = gpsToRT(gpsMatrix(:,2:end));
+% time_gps = gpsMatrix(:,1);
+%% gps data processing oxford
+gps =  load('C:\Users\OpenICV\Desktop\2018-04-02-23-16-56gps');
+imu =  load('C:\Users\OpenICV\Desktop\2018-04-02-23-16-56imu');
+[time_gps,gpsMatrix] = gpsToRT_oxford(gps,imu);
+
+
+
+%% slam data processing
+slamMatrix = load('C:\Users\OpenICV\Desktop\pose.txt');
+
+% %%%%%%%%%%%%%% rigid translation if slam pose is calculated by loam %%%%%%%
+% tmpMatrix(:,1) = slamMatrix(:,1);
+% tmpMatrix(:,2) = slamMatrix(:,4);
+% tmpMatrix(:,3) = slamMatrix(:,2);
+% tmpMatrix(:,4) = slamMatrix(:,3);
+% tmpMatrix(:,5) = slamMatrix(:,7);
+% tmpMatrix(:,6) = slamMatrix(:,5);
+% tmpMatrix(:,7) = slamMatrix(:,6);
+% 
+% slamMatrix = tmpMatrix;
+% location_slam = slamMatrix(:,5:7);
+% %%%%%%%%%%%%%%
+
+slamRTMatrix = slamMatrix(:,2:end);
+time_slam = slamMatrix(:,1);
+
+%% test plot
+plot3 (gpsMatrix(:,4),gpsMatrix(:,8),gpsMatrix(:,12));
+hold on
+plot3 (slamRTMatrix(:,4),slamRTMatrix(:,8),slamRTMatrix(:,12));
+grid on
+xlabel('x/m')
+ylabel('y/m')
+zlabel('z/m')
+axis equal
+
+%% synchronic
+index_valid = zeros(length(time_slam),1);
+index = zeros(length(time_slam),1);
+for i=1:1:length(time_gps)
+    [tmp,I]=min(abs(time_slam(:)-time_gps(i)));
+    if tmp<0.02
+        index_valid(i)=1;
+        index(i)=I;
+    end
+    
+end
+
+
+gpsRTMatrix_syned = gpsRTMatrix(index_valid == 1,:);
+slamRTMatrix_syned = slamRTMatrix(index(index>0),:);
+
+
+
+%% from RPY to RT
+
+
+
+
