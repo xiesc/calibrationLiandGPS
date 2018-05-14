@@ -20,8 +20,8 @@
 % gpsRTMatrix = gpsToRT(gpsMatrix(:,2:end));
 % time_gps = gpsMatrix(:,1);
 %% gps data processing oxford
-gps =  load('C:\Users\OpenICV\Desktop\2018-04-02-23-16-56gps');
-imu =  load('C:\Users\OpenICV\Desktop\2018-04-02-23-16-56imu');
+gps =  load('/home/xiesc/xieshichao/matlab work space/calibration_lidar_gps/calibration_sick_gps/2018-04-02-23-16-56gps.txt');
+imu =  load('/home/xiesc/xieshichao/matlab work space/calibration_lidar_gps/calibration_sick_gps/2018-04-02-23-16-56imu.txt');
 [time_gps,gpsRTMatrix] = gpsToRT_oxford(gps,imu);
 
 
